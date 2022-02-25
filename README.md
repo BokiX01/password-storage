@@ -6,7 +6,7 @@ DESCRIPTION:
 - All passwords are encrypted and stored in "storage.json" file
 
 INSTALLING INSTRUCTIONS:
-- Download the whole folder
+- Download the whole "Password Storage" folder
 
 RUNNING INSTRUCTIONS:
 1. Run "Password Storage.exe"
