@@ -29,6 +29,7 @@ if p_load(open(path, 'rb')) == b'':
     with open(path, 'wb') as f:
         p_dump(Fernet.generate_key(), f)
 
+
 class Security:
     @staticmethod
     def encrypt(password, key=b''):
@@ -47,6 +48,7 @@ class Security:
     def hash(not_hashed):
         return sha512(not_hashed.encode()).hexdigest()
 
+
 class ReadingAndWriting:
     passwords_to_read = j_load(open('resources/storage.json', 'r'))
     passwords = {'storage_login': {'username': passwords_to_read['storage_login']['username'],
@@ -59,13 +61,16 @@ class ReadingAndWriting:
     @staticmethod
     def writing(security_key=b''):
         with open('resources/storage.json', 'w') as f:
-            passwords_to_write = {'storage_login': {'username': ReadingAndWriting.passwords['storage_login']['username'],
-                                                    'password': ReadingAndWriting.passwords['storage_login']['password']},
-                                  'storage_passwords': {}}
+            passwords_to_write = {
+                'storage_login': {'username': ReadingAndWriting.passwords['storage_login']['username'],
+                                  'password': ReadingAndWriting.passwords['storage_login']['password']},
+                'storage_passwords': {}}
             for application, info in ReadingAndWriting.passwords['storage_passwords'].items():
                 for username, password in info.items():
-                    passwords_to_write['storage_passwords'][application] = {str(Security.encrypt(username, security_key))[1:]: password}
+                    passwords_to_write['storage_passwords'][application] = {
+                        str(Security.encrypt(username, security_key))[1:]: password}
             j_dump(passwords_to_write, f, indent=2)
+
 
 class Main:
     main_frame = Frame(root, padx=10, pady=10)
@@ -112,11 +117,12 @@ class Main:
             username_register.grid(row=1, column=1)
 
             Label(Main.main_frame, text='New password: ').grid(row=2, column=0)
-            password_register = Entry(Main.main_frame, borderwidth=3)
+            password_register = Entry(Main.main_frame, show='*', borderwidth=3)
             password_register.grid(row=2, column=1)
 
             Button(Main.main_frame, text='Submit',
-                   command=lambda: Main.Login.submit_register(username_register.get(), password_register.get())).grid(row=3, columnspan=2)
+                   command=lambda: Main.Login.submit_register(username_register.get(), password_register.get())).grid(
+                row=3, columnspan=2)
 
         @staticmethod
         def login():
@@ -144,7 +150,7 @@ class Main:
             username_login.grid(row=1, column=1)
 
             Label(Main.main_frame, text='Password: ').grid(row=2, column=0)
-            password_login = Entry(Main.main_frame, borderwidth=3)
+            password_login = Entry(Main.main_frame, show='*', borderwidth=3)
             password_login.grid(row=2, column=1)
 
             Button(Main.main_frame, text='Submit',
@@ -174,7 +180,7 @@ class Main:
             drop_menu = OptionMenu(Second.second_frame, default_var, *menu_list)
             drop_menu.grid(row=0, column=0)
             Button(Second.second_frame, text='Submit',
-                   command=lambda: (Second.get(default_var.get(), accounts_dict), password_info.delete(0, END)))\
+                   command=lambda: (Second.get(default_var.get(), accounts_dict), password_info.delete(0, END))) \
                 .grid(row=0, column=1)
 
         elif option_value == 'add':
@@ -214,7 +220,7 @@ class Main:
             username_register.grid(row=0, column=1)
 
             Label(Second.second_frame, text='New password: ').grid(row=1, column=0)
-            password_register = Entry(Second.second_frame, borderwidth=3)
+            password_register = Entry(Second.second_frame, show='*', borderwidth=3)
             password_register.grid(row=1, column=1)
             Button(Second.second_frame, text='Change',
                    command=lambda: Main.Login.submit_register(username_register.get(), password_register.get())) \
@@ -223,8 +229,10 @@ class Main:
         else:
             messagebox.showerror('Error', 'You didn\'t select any option!')
 
+
 class Second:
     second_frame = Frame(root, padx=10, pady=10)
+
     @staticmethod
     def generate():
         security_key = Fernet.generate_key()
@@ -237,7 +245,8 @@ class Second:
 
             for application, accounts in decrypted_passwords.items():
                 for username, password in accounts.items():
-                    ReadingAndWriting.passwords['storage_passwords'][application] = {username: str(Security.encrypt(password, security_key))[1:]}
+                    ReadingAndWriting.passwords['storage_passwords'][application] = {
+                        username: str(Security.encrypt(password, security_key))[1:]}
             ReadingAndWriting.writing(security_key)
 
         with open(path, 'wb') as key:
@@ -274,9 +283,11 @@ class Second:
     def add(application, username, password):
         if application != '' and username != '' and password != '':
             if application in ReadingAndWriting.passwords:
-                ReadingAndWriting.passwords['storage_passwords'][application.lower()] = {username: str(Security.encrypt(password))[1:]}
+                ReadingAndWriting.passwords['storage_passwords'][application.lower()] = {
+                    username: str(Security.encrypt(password))[1:]}
             else:
-                ReadingAndWriting.passwords['storage_passwords'][application.lower()] = {username: str(Security.encrypt(password))[1:]}
+                ReadingAndWriting.passwords['storage_passwords'][application.lower()] = {
+                    username: str(Security.encrypt(password))[1:]}
 
             ReadingAndWriting.writing()
             messagebox.showinfo('Info', 'New password added successfully.')
@@ -287,7 +298,8 @@ class Second:
     def change(application, username_info=''):
         def submit(application, username_info):
             def submit(application, username, password):
-                ReadingAndWriting.passwords['storage_passwords'][application.lower()] = {username: str(Security.encrypt(password))[1:]}
+                ReadingAndWriting.passwords['storage_passwords'][application.lower()] = {
+                    username: str(Security.encrypt(password))[1:]}
                 ReadingAndWriting.writing()
                 messagebox.showinfo('Info', 'Password changed successfully.')
 
@@ -296,7 +308,8 @@ class Second:
                 password_info_change = Entry(Second.second_frame, borderwidth=3)
                 password_info_change.grid(row=2, column=1)
                 Button(Second.second_frame, text='Change password',
-                       command=lambda: submit(application, username_info, password_info_change.get())).grid(row=4, columnspan=2)
+                       command=lambda: submit(application, username_info, password_info_change.get())).grid(row=4,
+                                                                                                            columnspan=2)
             else:
                 messagebox.showerror('Error', 'You didn\'t fill the username input field!')
 
@@ -315,6 +328,7 @@ class Second:
             widget.grid_forget()
 
         Main.confirm(option)
+
 
 Main.Login.check_login()
 mainloop()
